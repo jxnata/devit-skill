@@ -33,15 +33,15 @@
       theme: {
         extend: {
           colors: {
-            bg: '#04080F',
-            surface: '#080F1C',
-            'surface-2': '#0C1628',
-            border: '#162035',
-            'border-2': '#1E2E48',
+            bg: '#0D0A07',
+            surface: '#131008',
+            'surface-2': '#191309',
+            border: '#2C1E10',
+            'border-2': '#3A2716',
             accent: '#FF6C37',
             'accent-hi': '#FFB090',
-            muted: '#8AA4BE',
-            'muted-2': '#9EB5C8',
+            muted: '#9A8272',
+            'muted-2': '#B59880',
             green: '#34D399',
             yellow: '#FBBF24',
             red: '#F87171',
@@ -64,7 +64,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { background-color: #04080F; color: #C8D8E8; }
+    body { background-color: #0D0A07; color: #EDE5D8; }
 
     /* subtle dot grid */
     .dot-grid {
@@ -86,7 +86,7 @@
 
     /* gradient text */
     .text-gradient {
-      background: linear-gradient(120deg, #C8D8E8 30%, #FF6C37 100%);
+      background: linear-gradient(120deg, #EDE5D8 30%, #FF6C37 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -120,25 +120,25 @@
 
     /* terminal window */
     .terminal {
-      background: #05090F;
-      border: 1px solid #162035;
+      background: #090704;
+      border: 1px solid #2C1E10;
       border-radius: 12px;
       overflow: hidden;
     }
     .terminal-bar {
-      background: #080F1C;
+      background: #110D08;
       padding: 10px 14px;
       display: flex;
       align-items: center;
       gap: 6px;
-      border-bottom: 1px solid #162035;
+      border-bottom: 1px solid #2C1E10;
     }
     .t-dot { width: 11px; height: 11px; border-radius: 50%; }
 
     /* card */
     .card {
-      background: #080F1C;
-      border: 1px solid #162035;
+      background: #131008;
+      border: 1px solid #2C1E10;
       border-radius: 12px;
       transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
@@ -152,13 +152,13 @@
     .nav-glass {
       backdrop-filter: blur(16px) saturate(180%);
       -webkit-backdrop-filter: blur(16px) saturate(180%);
-      background: rgba(4, 8, 15, 0.80);
+      background: rgba(13, 10, 7, 0.88);
     }
 
     /* buttons */
     .btn-solid {
       background: #FF6C37;
-      color: #04080F;
+      color: #0D0A07;
       font-weight: 600;
       padding: 11px 26px;
       border-radius: 8px;
@@ -171,8 +171,8 @@
     .btn-solid:hover { background: #FFB090; transform: translateY(-1px); }
 
     .btn-outline {
-      color: #C8D8E8;
-      border: 1px solid #162035;
+      color: #EDE5D8;
+      border: 1px solid #2C1E10;
       padding: 11px 26px;
       border-radius: 8px;
       display: inline-flex;
@@ -207,8 +207,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #080F1C;
-      border: 1px solid #162035;
+      background: #131008;
+      border: 1px solid #2C1E10;
       border-radius: 999px;
       padding: 5px 14px;
       font-family: 'JetBrains Mono', monospace;
@@ -226,11 +226,11 @@
     }
 
     /* divider line */
-    .div-line { flex: 1; height: 1px; background: #162035; }
+    .div-line { flex: 1; height: 1px; background: #2C1E10; }
 
     /* flow highlight card */
     .card-highlight {
-      background: #080F1C;
+      background: #131008;
       border: 1px solid rgba(255, 108, 55, 0.18);
       border-radius: 12px;
       transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
@@ -266,7 +266,7 @@
     .syn-key  { color: #FF6C37; }
     .syn-str  { color: #FCD34D; }
     .syn-num  { color: #34D399; }
-    .syn-cmt  { color: #6B8299; }
+    .syn-cmt  { color: #7A6A56; }
 
     /* radial hero glow */
     .hero-glow {
@@ -276,7 +276,7 @@
     /* scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #162035; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #2C1E10; border-radius: 3px; }
   </style>
 </head>
 
@@ -621,7 +621,7 @@
               <span class="font-mono text-muted text-xs ml-2">.devit/epics/3/tasks/1.json</span>
             </div>
             <div class="p-5 font-mono text-xs overflow-auto" style="max-height:400px;">
-<pre style="line-height:1.75; color:#C8D8E8; margin:0;">{
+<pre style="line-height:1.75; color:#EDE5D8; margin:0;">{
   <span class="syn-key">"id"</span>: <span class="syn-num">1</span>,
   <span class="syn-key">"title"</span>: <span class="syn-str">"Setup OAuth provider config"</span>,
   <span class="syn-key">"description"</span>: <span class="syn-str">"Create config module with
@@ -803,7 +803,7 @@
     <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-5">
       <a href="#" class="font-mono text-accent font-medium">devit</a>
       <div class="text-muted text-sm text-center">
-        Built for <a href="https://claude.ai/code" target="_blank" rel="noopener" class="hover:text-accent transition-colors">Claude Code</a>. MIT License. Free forever.
+        Built for Claude Code with devit, by <a href="https://github.com/jxnata" target="_blank" rel="noopener" class="hover:text-accent transition-colors">jxnata</a>
       </div>
       <div class="flex items-center gap-5">
         <a href="https://github.com/jxnata/devit-skill" target="_blank" rel="noopener"
@@ -847,7 +847,7 @@
             navLinks.forEach(link => {
               const href = link.getAttribute('href').slice(1);
               if (href === entry.target.id) {
-                link.style.color = '#C8D8E8';
+                link.style.color = '#EDE5D8';
               } else {
                 link.style.color = '';
               }
