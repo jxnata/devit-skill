@@ -119,8 +119,8 @@
 
 			/* terminal */
 			.terminal {
-				background: #0D0D0D;
-				border: 1px solid #2C2C2C;
+				background: #0d0d0d;
+				border: 1px solid #2c2c2c;
 				border-radius: 18px;
 				overflow: hidden;
 			}
@@ -130,7 +130,7 @@
 				display: flex;
 				align-items: center;
 				gap: 6px;
-				border-bottom: 1px solid #2C2C2C;
+				border-bottom: 1px solid #2c2c2c;
 			}
 			.t-dot {
 				width: 11px;
@@ -140,8 +140,8 @@
 
 			/* card */
 			.card {
-				background: #1E1E1E;
-				border: 1px solid #2C2C2C;
+				background: #1e1e1e;
+				border: 1px solid #2c2c2c;
 				border-radius: 18px;
 				transition:
 					border-color 0.25s ease,
@@ -153,8 +153,8 @@
 			}
 
 			.card-highlight {
-				background: #1E1E1E;
-				border: 1px solid #3C3C3C;
+				background: #1e1e1e;
+				border: 1px solid #3c3c3c;
 				border-radius: 18px;
 				transition:
 					border-color 0.25s ease,
@@ -168,7 +168,7 @@
 			/* nav */
 			.nav-solid {
 				background: #141414;
-				border-bottom: 1px solid #2C2C2C;
+				border-bottom: 1px solid #2c2c2c;
 			}
 
 			/* buttons */
@@ -193,7 +193,7 @@
 
 			.btn-outline {
 				color: #f0eae0;
-				border: 1px solid #2C2C2C;
+				border: 1px solid #2c2c2c;
 				padding: 11px 26px;
 				border-radius: 12px;
 				display: inline-flex;
@@ -231,8 +231,8 @@
 				display: inline-flex;
 				align-items: center;
 				gap: 6px;
-				background: #1E1E1E;
-				border: 1px solid #2C2C2C;
+				background: #1e1e1e;
+				border: 1px solid #2c2c2c;
 				border-radius: 999px;
 				padding: 5px 16px;
 				font-family: "JetBrains Mono", monospace;
@@ -252,7 +252,7 @@
 			.div-line {
 				flex: 1;
 				height: 1px;
-				background: #2C2C2C;
+				background: #2c2c2c;
 			}
 
 			/* tag */
@@ -299,7 +299,7 @@
 				background: transparent;
 			}
 			::-webkit-scrollbar-thumb {
-				background: #2C2C2C;
+				background: #2c2c2c;
 				border-radius: 3px;
 			}
 		</style>
@@ -328,21 +328,16 @@
 						</svg>
 						GitHub
 					</a>
-					<a href="#install" class="btn-solid">Install</a>
+					<a href="#install" class="btn-solid h-10">Install</a>
 				</div>
 			</div>
 		</nav>
 
 		<!-- HERO -->
 		<section class="min-h-screen flex items-center pt-[62px]">
-			<div class="max-w-6xl mx-auto px-6 w-full py-24 grid lg:grid-cols-[1fr_1.15fr] gap-16 items-center">
+			<div class="max-w-6xl mx-auto px-6 w-full py-24 grid lg:grid-cols-[1fr_1.15fr] gap-16 items-start">
 				<div>
-					<div class="badge mb-8">
-						<span class="w-1.5 h-1.5 rounded-full bg-green inline-block"></span>
-						Claude Code Skill
-					</div>
-
-					<h1 class="font-display font-bold leading-[1.08] mb-6 text-white" style="font-size: clamp(3.2rem, 6vw, 5.2rem)">
+					<h1 class="font-display font-bold leading-[1.08] mb-6 text-white" style="font-size: clamp(3.2rem, 5.4vw, 5.2rem)">
 						Ship features<br />
 						<span class="text-accent">with discipline.</span>
 					</h1>
@@ -371,18 +366,13 @@
 						</div>
 						<div class="w-px h-8 bg-border"></div>
 						<div>
-							<div class="font-mono text-base text-accent">4 stacks</div>
+							<div class="font-mono text-base text-accent">Any stack</div>
 							<div class="text-sm text-muted mt-0.5">Auto-detected</div>
 						</div>
 						<div class="w-px h-8 bg-border"></div>
 						<div>
 							<div class="font-mono text-base text-accent">MIT</div>
 							<div class="text-sm text-muted mt-0.5">Free forever</div>
-						</div>
-						<div class="w-px h-8 bg-border"></div>
-						<div>
-							<div class="font-mono text-base text-accent">No config</div>
-							<div class="text-sm text-muted mt-0.5">Plug and play</div>
 						</div>
 					</div>
 				</div>
@@ -497,7 +487,7 @@
 						<div class="card-highlight p-8 h-full flex flex-col">
 							<div class="flex items-center gap-3 mb-6">
 								<span class="step-num">02</span>
-								<div class="div-line" style="background: #3C3C3C"></div>
+								<div class="div-line" style="background: #3c3c3c"></div>
 							</div>
 							<span class="tag mb-5">/devit plan [feature]</span>
 							<h3 class="font-display text-2xl font-semibold text-white mb-3">Break it into tasks</h3>
@@ -702,7 +692,7 @@
 			<div class="max-w-6xl mx-auto px-6">
 				<div class="max-w-xl mb-12 reveal">
 					<div class="section-label mb-4">Installation</div>
-					<h2 class="font-display text-4xl font-bold text-white mb-4">One command to install. Updates via git pull.</h2>
+					<h2 class="font-display text-4xl font-bold text-white mb-4">One command to install.</h2>
 					<p class="text-muted-2 text-lg">Installed as a symlink. Run git pull to update.</p>
 				</div>
 
@@ -811,12 +801,12 @@
 
 				<div class="flex flex-wrap gap-4 justify-center">
 					<a href="https://github.com/jxnata/devit-skill" target="_blank" rel="noopener" class="btn-solid text-base py-3 px-8">
-						<svg class="w-5 h-5 text-muted-2" fill="currentColor" viewBox="0 0 24 24">
+						<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 							<path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 18.896l-7.416 4.517 1.48-8.279L0 9.306l8.332-1.151z" />
 						</svg>
 						Star on GitHub
 					</a>
-					<a href="#install" class="btn-outline text-base py-3 px-8">Install devit</a>
+					<a href="#install" class="btn-outline text-base font-bold py-3 px-8">Install devit</a>
 				</div>
 			</div>
 		</section>
