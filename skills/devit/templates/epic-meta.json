@@ -1,0 +1,18 @@
+{
+	"epic": "E01",
+	"title": "Epic Title",
+	"objective": "One or two sentences describing the business value this epic delivers.",
+	"branch": "feature/epic-slug",
+	"pull_request": null,
+	"pr_per_task": false,
+	"tasks": [
+		{
+			"id": 1,
+			"title": "Task title (verb + noun)",
+			"file": "tasks/1.json",
+			"status": "pending",
+			"commits": [],
+			"pull_request": null
+		}
+	]
+}

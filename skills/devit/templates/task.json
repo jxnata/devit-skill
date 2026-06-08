@@ -1,0 +1,28 @@
+{
+	"id": 1,
+	"title": "Verb + noun, under 60 characters",
+	"description": "What this task does and why (1–3 sentences). Include what changes and what outcome it enables.",
+	"steps": [
+		"Write failing tests for <expected behavior>",
+		"Create src/path/to/file.ts",
+		"Define <type/schema>: field (validation rule)",
+		"Implement to pass tests",
+		"Refactor safely"
+	],
+	"tests": [
+		"Happy path — nominal input produces expected output",
+		"Validation errors — invalid input is rejected",
+		"Edge cases — boundary values, empty/null",
+		"Conditional logic — branching behavior"
+	],
+	"acceptanceCriteria": [
+		"All tests pass",
+		"Feature behaves as specified in description",
+		"Loading/error/empty states handled",
+		"No type errors"
+	],
+	"files": {
+		"modify": ["src/existing/file.ts"],
+		"create": ["src/new/file.ts", "src/new/file.test.ts"]
+	}
+}
