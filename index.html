@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary SEO -->
+  <title>devit: Structured TDD Feature Development for Claude Code</title>
+  <meta name="description" content="devit is a Claude Code skill that brings structured, TDD-driven feature development to any project. Plan features as epics, break them into atomic tasks, and execute with mandatory verification at every step.">
+  <meta name="keywords" content="Claude Code skill, TDD workflow, feature planning, AI development, devit, structured development, test driven development, Claude Code extension">
+  <meta name="author" content="devit contributors">
+  <link rel="canonical" href="https://jxnata.github.io/devit-skill/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jxnata.github.io/devit-skill/">
+  <meta property="og:title" content="devit: Structured TDD Feature Development for Claude Code">
+  <meta property="og:description" content="Break features into epics. Execute with discipline. Ship with confidence.">
+  <meta property="og:site_name" content="devit">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="devit: Structured TDD Feature Development for Claude Code">
+  <meta name="twitter:description" content="Break features into epics. Execute with discipline. Ship with confidence.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2304080F'/><text x='5' y='23' font-size='20' font-family='monospace' fill='%2338BDF8'>d</text></svg>">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#04080F',
+            surface: '#080F1C',
+            'surface-2': '#0C1628',
+            border: '#162035',
+            'border-2': '#1E2E48',
+            accent: '#38BDF8',
+            'accent-hi': '#7DD3FC',
+            muted: '#4E6680',
+            'muted-2': '#6B8299',
+            green: '#34D399',
+            yellow: '#FBBF24',
+            red: '#F87171',
+          },
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { background-color: #04080F; color: #C8D8E8; }
+
+    /* subtle dot grid */
+    .dot-grid {
+      background-image: radial-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    /* line grid variant */
+    .line-grid {
+      background-image:
+        linear-gradient(rgba(56, 189, 248, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    /* glow effects */
+    .glow-sm  { box-shadow: 0 0 30px rgba(56, 189, 248, 0.08); }
+    .glow-md  { box-shadow: 0 0 60px rgba(56, 189, 248, 0.10); }
+
+    /* gradient text */
+    .text-gradient {
+      background: linear-gradient(120deg, #C8D8E8 30%, #38BDF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 7px;
+      height: 1em;
+      background: #38BDF8;
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.08s; }
+    .reveal-delay-2 { transition-delay: 0.16s; }
+    .reveal-delay-3 { transition-delay: 0.24s; }
+    .reveal-delay-4 { transition-delay: 0.32s; }
+    .reveal-delay-5 { transition-delay: 0.40s; }
+
+    /* terminal window */
+    .terminal {
+      background: #05090F;
+      border: 1px solid #162035;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .terminal-bar {
+      background: #080F1C;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid #162035;
+    }
+    .t-dot { width: 11px; height: 11px; border-radius: 50%; }
+
+    /* card */
+    .card {
+      background: #080F1C;
+      border: 1px solid #162035;
+      border-radius: 12px;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* nav */
+    .nav-glass {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background: rgba(4, 8, 15, 0.80);
+    }
+
+    /* buttons */
+    .btn-solid {
+      background: #38BDF8;
+      color: #04080F;
+      font-weight: 600;
+      padding: 11px 26px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease, transform 0.15s ease;
+      font-size: 0.875rem;
+    }
+    .btn-solid:hover { background: #7DD3FC; transform: translateY(-1px); }
+
+    .btn-outline {
+      color: #C8D8E8;
+      border: 1px solid #162035;
+      padding: 11px 26px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+      font-size: 0.875rem;
+    }
+    .btn-outline:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.04);
+      transform: translateY(-1px);
+    }
+
+    /* float animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+    .float-slow  { animation: float 5s ease-in-out infinite; }
+    .float-slow2 { animation: float 5s ease-in-out infinite 2.5s; }
+
+    /* terminal line fade-in sequence */
+    .tl { opacity: 0; }
+    @keyframes tl-in {
+      from { opacity: 0; transform: translateX(-3px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #080F1C;
+      border: 1px solid #162035;
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #4E6680;
+    }
+
+    /* step number */
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #38BDF8;
+      opacity: 0.7;
+    }
+
+    /* divider line */
+    .div-line { flex: 1; height: 1px; background: #162035; }
+
+    /* flow highlight card */
+    .card-highlight {
+      background: #080F1C;
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 12px;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.04);
+    }
+    .card-highlight:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      transform: translateY(-2px);
+    }
+
+    /* small tag */
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      background: rgba(56, 189, 248, 0.08);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      border-radius: 5px;
+      padding: 3px 8px;
+      display: inline-block;
+    }
+
+    /* section label */
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #38BDF8;
+    }
+
+    /* code syntax */
+    .syn-key  { color: #38BDF8; }
+    .syn-str  { color: #FCD34D; }
+    .syn-num  { color: #34D399; }
+    .syn-cmt  { color: #3A5270; }
+
+    /* radial hero glow */
+    .hero-glow {
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(56,189,248,0.07) 0%, transparent 70%);
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #162035; border-radius: 3px; }
+  </style>
+</head>
+
+<body class="font-body">
+
+  <!-- ░░ NAVIGATION ░░ -->
+  <nav class="fixed top-0 w-full z-50 nav-glass border-b border-border/60">
+    <div class="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
+      <a href="#" class="font-mono text-accent font-medium text-base tracking-tight">devit</a>
+
+      <div class="hidden md:flex items-center gap-7">
+        <a href="#how-it-works" class="text-muted-2 hover:text-white text-sm transition-colors">How it works</a>
+        <a href="#features"     class="text-muted-2 hover:text-white text-sm transition-colors">Features</a>
+        <a href="#install"      class="text-muted-2 hover:text-white text-sm transition-colors">Install</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/jxnata/devit-skill" target="_blank" rel="noopener"
+           class="flex items-center gap-1.5 text-muted-2 hover:text-white text-sm transition-colors">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+          </svg>
+          GitHub
+        </a>
+        <a href="#install" class="btn-solid">Install</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ░░ HERO ░░ -->
+  <section class="dot-grid min-h-screen flex items-center pt-[60px] relative overflow-hidden">
+    <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-6 w-full py-20 grid lg:grid-cols-[1fr_1.1fr] gap-14 items-center">
+
+      <!-- Left -->
+      <div>
+        <div class="badge mb-7">
+          <span class="w-1.5 h-1.5 rounded-full bg-green inline-block" style="box-shadow:0 0 6px #34D399;"></span>
+          Claude Code Skill
+        </div>
+
+        <h1 class="font-display font-bold leading-[1.1] mb-5" style="font-size: clamp(2.4rem, 5vw, 3.6rem);">
+          Ship features<br>
+          <span class="text-gradient">with discipline.</span>
+        </h1>
+
+        <p class="text-muted-2 text-lg leading-relaxed mb-9 max-w-md">
+          devit brings structured, TDD-driven feature development to Claude Code. Plan epics, break them into atomic tasks, and execute with mandatory verification at every step.
+        </p>
+
+        <div class="flex flex-wrap gap-3 mb-10">
+          <a href="#install" class="btn-solid text-base py-3 px-7">
+            Get started
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="https://github.com/jxnata/devit-skill" target="_blank" rel="noopener" class="btn-outline text-base py-3 px-7">
+            <svg class="w-4 h-4 text-yellow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 18.896l-7.416 4.517 1.48-8.279L0 9.306l8.332-1.151z"/></svg>
+            Star on GitHub
+          </a>
+        </div>
+
+        <div class="flex items-center gap-5 pt-7 border-t border-border">
+          <div>
+            <div class="font-mono text-sm text-accent">TDD-first</div>
+            <div class="text-xs text-muted mt-0.5">Always enforced</div>
+          </div>
+          <div class="w-px h-8 bg-border"></div>
+          <div>
+            <div class="font-mono text-sm text-accent">4 stacks</div>
+            <div class="text-xs text-muted mt-0.5">Auto-detected</div>
+          </div>
+          <div class="w-px h-8 bg-border"></div>
+          <div>
+            <div class="font-mono text-sm text-accent">MIT</div>
+            <div class="text-xs text-muted mt-0.5">Free forever</div>
+          </div>
+          <div class="w-px h-8 bg-border"></div>
+          <div>
+            <div class="font-mono text-sm text-accent">No config</div>
+            <div class="text-xs text-muted mt-0.5">Plug and play</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: terminal -->
+      <div class="float-slow">
+        <div class="terminal glow-md" id="hero-terminal">
+          <div class="terminal-bar">
+            <div class="t-dot" style="background:#FF5F57"></div>
+            <div class="t-dot" style="background:#FEBC2E"></div>
+            <div class="t-dot" style="background:#28C840"></div>
+            <span class="font-mono text-muted text-xs ml-2 tracking-tight">claude -- my-project</span>
+          </div>
+          <div class="p-5 font-mono text-sm leading-7 space-y-0.5" id="hero-lines">
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 0.3s forwards;"># Start structured development</div>
+            <div class="tl" style="animation: tl-in 0.3s ease 0.7s forwards;"><span class="text-green">$</span> <span class="text-white">/devit plan add OAuth authentication</span></div>
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 1.1s forwards;">Analyzing project structure...</div>
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 1.4s forwards;">Stack detected: <span class="text-accent">TypeScript / Node</span></div>
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 1.7s forwards;">Package manager: <span class="text-accent">bun</span></div>
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 2.0s forwards;">Creating epic <span class="text-accent">E03</span>...</div>
+            <div class="tl" style="animation: tl-in 0.3s ease 2.3s forwards;">&nbsp;</div>
+            <div class="tl text-white" style="animation: tl-in 0.3s ease 2.5s forwards;">Tasks created:</div>
+            <div class="tl text-green" style="animation: tl-in 0.3s ease 2.8s forwards;">  + E03 task 1: Setup OAuth provider config</div>
+            <div class="tl text-green" style="animation: tl-in 0.3s ease 3.1s forwards;">  + E03 task 2: Implement token storage layer</div>
+            <div class="tl text-green" style="animation: tl-in 0.3s ease 3.4s forwards;">  + E03 task 3: Add protected route middleware</div>
+            <div class="tl text-green" style="animation: tl-in 0.3s ease 3.7s forwards;">  + E03 task 4: Write integration tests</div>
+            <div class="tl" style="animation: tl-in 0.3s ease 4.0s forwards;">&nbsp;</div>
+            <div class="tl" style="animation: tl-in 0.3s ease 4.2s forwards;"><span class="text-green">$</span> <span class="text-white">/devit execute</span></div>
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 4.6s forwards;">Starting E03 task 1 <span class="text-accent">in_progress</span></div>
+            <div class="tl syn-cmt" style="animation: tl-in 0.3s ease 4.9s forwards;">Writing failing tests first...<span class="cursor" style="animation-delay:4.9s;"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ PROBLEM ░░ -->
+  <section class="py-24 border-t border-border">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-2xl mx-auto text-center mb-14 reveal">
+        <h2 class="font-display text-3xl lg:text-4xl font-bold mb-4">Development without structure is expensive.</h2>
+        <p class="text-muted-2 text-lg leading-relaxed">When Claude has no plan, tasks drift in scope, verification gets skipped, and the same problems resurface. Structure changes that.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="card p-6 reveal reveal-delay-1">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-4" style="background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2);">
+            <svg class="w-4 h-4 text-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <h3 class="font-display font-semibold mb-2 text-white">Context drift</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Without a defined scope, implementations grow beyond the task boundary and break unrelated functionality in ways that are hard to trace.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-2">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-4" style="background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);">
+            <svg class="w-4 h-4 text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1"/></svg>
+          </div>
+          <h3 class="font-display font-semibold mb-2 text-white">Skipped verification</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Tests, lint, and type checks get bypassed under pressure. Bugs reach production that a single verification pass would have caught.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-3">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-4" style="background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);">
+            <svg class="w-4 h-4" style="color:#818CF8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </div>
+          <h3 class="font-display font-semibold mb-2 text-white">Incomplete features</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Large features without a task breakdown often stall. No clear definition of done means no clear finish line and no accountability.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ HOW IT WORKS ░░ -->
+  <section id="how-it-works" class="py-24 border-t border-border line-grid">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-xl mb-14 reveal">
+        <div class="section-label mb-4">How it works</div>
+        <h2 class="font-display text-3xl lg:text-4xl font-bold mb-4">Three commands. A complete workflow.</h2>
+        <p class="text-muted-2 text-lg leading-relaxed">devit structures every feature into a repeatable, verifiable cycle. From zero to shipped.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-5">
+
+        <!-- Step 1 -->
+        <div class="reveal reveal-delay-1">
+          <div class="card p-7 h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-5">
+              <span class="step-num">01</span>
+              <div class="div-line"></div>
+            </div>
+            <span class="tag mb-4">/devit start</span>
+            <h3 class="font-display text-xl font-semibold text-white mb-2">Initialize your project</h3>
+            <p class="text-muted-2 text-sm leading-relaxed flex-1 mb-6">devit reads your manifest files and lockfiles to detect your stack, package manager, test runner, linter, and type checker. It writes project-adapted workflow guides into <code class="font-mono text-xs text-accent">.devit/</code>.</p>
+            <div class="pt-5 border-t border-border space-y-1.5">
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> Stack auto-detection</div>
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> Command resolution</div>
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> .devit/ scaffold</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 (highlighted) -->
+        <div class="reveal reveal-delay-2">
+          <div class="card-highlight p-7 h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-5">
+              <span class="step-num">02</span>
+              <div class="div-line" style="background: rgba(56,189,248,0.15);"></div>
+            </div>
+            <span class="tag mb-4">/devit plan [feature]</span>
+            <h3 class="font-display text-xl font-semibold text-white mb-2">Break it into tasks</h3>
+            <p class="text-muted-2 text-sm leading-relaxed flex-1 mb-6">Describe a feature in natural language. devit creates an epic with ordered, atomic 1-2 hour tasks. Each task includes TDD steps, expected test cases, acceptance criteria, and the exact files to touch.</p>
+            <div class="pt-5 border-t border-border/60 space-y-1.5">
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> Epic + task JSON</div>
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> TDD steps per task</div>
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> Dependency ordering</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="reveal reveal-delay-3">
+          <div class="card p-7 h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-5">
+              <span class="step-num">03</span>
+              <div class="div-line"></div>
+            </div>
+            <span class="tag mb-4">/devit execute</span>
+            <h3 class="font-display text-xl font-semibold text-white mb-2">Execute with verification</h3>
+            <p class="text-muted-2 text-sm leading-relaxed flex-1 mb-6">devit runs a 6-step per-task workflow: write failing tests, implement, verify (type-check + lint + tests pass), commit with a structured message, and update task status. Done is never declared without passing verification.</p>
+            <div class="pt-5 border-t border-border space-y-1.5">
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> 6-step workflow</div>
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> Mandatory verification</div>
+              <div class="font-mono text-xs text-muted flex items-center gap-2"><span class="text-green">+</span> Auto commit + status</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model note -->
+      <div class="mt-8 reveal reveal-delay-4">
+        <div class="card p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-mono text-xs text-accent">Model recommendation</span>
+          </div>
+          <div class="h-px sm:h-5 w-full sm:w-px bg-border"></div>
+          <div class="text-sm text-muted-2">
+            Use <span class="font-mono text-white text-xs">Opus</span> for <code class="font-mono text-xs text-accent">/devit plan</code> to get the best task breakdown.
+            Switch to <span class="font-mono text-white text-xs">Sonnet</span> for <code class="font-mono text-xs text-accent">/devit execute</code> for fast, focused implementation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ FEATURES ░░ -->
+  <section id="features" class="py-24 border-t border-border">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-xl mb-14 reveal">
+        <div class="section-label mb-4">Features</div>
+        <h2 class="font-display text-3xl lg:text-4xl font-bold mb-4">Built for real development workflows.</h2>
+        <p class="text-muted-2 text-lg leading-relaxed">Every design decision in devit comes from the friction of building features without structure.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="card p-6 reveal reveal-delay-1">
+          <div class="section-label mb-3">TDD enforcement</div>
+          <h3 class="font-display font-semibold text-white mb-2">Tests before code</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Every task begins with a failing test. The execution flow refuses to move forward without one. No exceptions, no shortcuts.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-2">
+          <div class="section-label mb-3">Stack detection</div>
+          <h3 class="font-display font-semibold text-white mb-2">Works with your toolchain</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Reads manifest files and lockfiles to find your package manager, test runner, linter, and type checker. Works with Node, Python, Go, and Rust.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-3">
+          <div class="section-label mb-3">Verification gates</div>
+          <h3 class="font-display font-semibold text-white mb-2">Definition of done, enforced</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Type-check, lint, and all tests must pass before a task is marked complete. Partial success is not success.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-1">
+          <div class="section-label mb-3">Atomic tasks</div>
+          <h3 class="font-display font-semibold text-white mb-2">1-2 hour scoping</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Tasks are sized to be completable in a single focused session. No ambiguous chunks that grow into multi-day rabbit holes.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-2">
+          <div class="section-label mb-3">Simple task flow</div>
+          <h3 class="font-display font-semibold text-white mb-2">No overhead for small fixes</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Quick bug fixes and isolated changes skip epic scaffolding entirely. Same TDD discipline, zero boilerplate.</p>
+        </div>
+
+        <div class="card p-6 reveal reveal-delay-3">
+          <div class="section-label mb-3">Commit format</div>
+          <h3 class="font-display font-semibold text-white mb-2">Traceable history</h3>
+          <p class="text-muted-2 text-sm leading-relaxed">Every commit is tagged with its epic and task: <code class="font-mono text-xs text-accent">feat: description (E03 task 2)</code>. Status and commit hash tracked in meta.json.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ TASK ANATOMY ░░ -->
+  <section class="py-24 border-t border-border dot-grid">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-14 items-start">
+
+        <div class="reveal">
+          <div class="section-label mb-4">Task format</div>
+          <h2 class="font-display text-3xl font-bold text-white mb-4">Every task tells Claude exactly what to build.</h2>
+          <p class="text-muted-2 leading-relaxed mb-8">Each task JSON includes TDD steps, concrete test cases, acceptance criteria, and the exact files to touch. Claude has everything it needs without a long prompt chain.</p>
+
+          <div class="space-y-5">
+            <div class="flex gap-4">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2);">
+                <svg class="w-3 h-3 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <div class="font-medium text-sm text-white mb-0.5">Steps array</div>
+                <div class="text-muted-2 text-sm">TDD-ordered steps: write failing test, create file, implement, refactor.</div>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2);">
+                <svg class="w-3 h-3 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <div class="font-medium text-sm text-white mb-0.5">Tests array</div>
+                <div class="text-muted-2 text-sm">Specific test cases: happy path, validation errors, edge cases.</div>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2);">
+                <svg class="w-3 h-3 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <div class="font-medium text-sm text-white mb-0.5">Acceptance criteria</div>
+                <div class="text-muted-2 text-sm">Explicit conditions that must be true before the task is considered done.</div>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2);">
+                <svg class="w-3 h-3 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <div class="font-medium text-sm text-white mb-0.5">Files list</div>
+                <div class="text-muted-2 text-sm">Exactly which files to modify and which to create. Scope stays contained.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2 float-slow2">
+          <div class="terminal glow-sm">
+            <div class="terminal-bar">
+              <div class="t-dot" style="background:#FF5F57"></div>
+              <div class="t-dot" style="background:#FEBC2E"></div>
+              <div class="t-dot" style="background:#28C840"></div>
+              <span class="font-mono text-muted text-xs ml-2">.devit/epics/3/tasks/1.json</span>
+            </div>
+            <div class="p-5 font-mono text-xs overflow-auto" style="max-height:400px;">
+<pre style="line-height:1.75; color:#C8D8E8; margin:0;">{
+  <span class="syn-key">"id"</span>: <span class="syn-num">1</span>,
+  <span class="syn-key">"title"</span>: <span class="syn-str">"Setup OAuth provider config"</span>,
+  <span class="syn-key">"description"</span>: <span class="syn-str">"Create config module with
+  provider-specific settings."</span>,
+  <span class="syn-key">"steps"</span>: [
+    <span class="syn-str">"Write failing test for getAuthConfig()"</span>,
+    <span class="syn-str">"Create src/auth/config.ts"</span>,
+    <span class="syn-str">"Define AuthConfig interface"</span>,
+    <span class="syn-str">"Implement to pass tests"</span>,
+    <span class="syn-str">"Refactor safely"</span>
+  ],
+  <span class="syn-key">"tests"</span>: [
+    <span class="syn-str">"returns config for valid provider"</span>,
+    <span class="syn-str">"throws on unknown provider"</span>,
+    <span class="syn-str">"handles missing env vars"</span>
+  ],
+  <span class="syn-key">"acceptanceCriteria"</span>: [
+    <span class="syn-str">"All tests pass"</span>,
+    <span class="syn-str">"No TypeScript errors"</span>,
+    <span class="syn-str">"No lint warnings"</span>
+  ],
+  <span class="syn-key">"files"</span>: {
+    <span class="syn-key">"create"</span>: [
+      <span class="syn-str">"src/auth/config.ts"</span>,
+      <span class="syn-str">"src/auth/config.test.ts"</span>
+    ]
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ INSTALL ░░ -->
+  <section id="install" class="py-24 border-t border-border">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-xl mb-12 reveal">
+        <div class="section-label mb-4">Installation</div>
+        <h2 class="font-display text-3xl font-bold text-white mb-4">One command to install. Updates via git pull.</h2>
+        <p class="text-muted-2 leading-relaxed">Installed as a symlink, so pulling the latest changes updates the skill instantly. No re-install needed.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+
+        <div class="space-y-5 reveal reveal-delay-1">
+          <div>
+            <div class="text-sm font-medium text-white mb-2">One-line install</div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="t-dot" style="background:#FF5F57"></div>
+                <div class="t-dot" style="background:#FEBC2E"></div>
+                <div class="t-dot" style="background:#28C840"></div>
+              </div>
+              <div class="p-4 font-mono text-xs">
+                <span class="text-green">$</span> <span class="text-white break-all select-all">git clone https://github.com/jxnata/devit-skill.git &amp;&amp; cd devit-skill &amp;&amp; bash install.sh</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium text-white mb-2">Then in any project</div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="t-dot" style="background:#FF5F57"></div>
+                <div class="t-dot" style="background:#FEBC2E"></div>
+                <div class="t-dot" style="background:#28C840"></div>
+              </div>
+              <div class="p-4 font-mono text-sm space-y-1">
+                <div><span class="text-green">$</span> <span class="text-white">/devit start</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium text-white mb-2">Keep it updated</div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="t-dot" style="background:#FF5F57"></div>
+                <div class="t-dot" style="background:#FEBC2E"></div>
+                <div class="t-dot" style="background:#28C840"></div>
+              </div>
+              <div class="p-4 font-mono text-sm">
+                <div><span class="text-green">$</span> <span class="syn-cmt">cd devit-skill &amp;&amp; git pull</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div class="card p-6 h-full">
+            <div class="section-label mb-5">Prerequisites</div>
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <div class="font-mono text-sm text-accent w-5 flex-shrink-0">1.</div>
+                <div>
+                  <div class="text-sm font-medium text-white">Claude Code</div>
+                  <div class="text-muted-2 text-xs mt-0.5">Installed and authenticated. Get it at <a href="https://claude.ai/code" target="_blank" rel="noopener" class="text-accent hover:text-accent-hi transition-colors">claude.ai/code</a>.</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="font-mono text-sm text-accent w-5 flex-shrink-0">2.</div>
+                <div>
+                  <div class="text-sm font-medium text-white">Git</div>
+                  <div class="text-muted-2 text-xs mt-0.5">To clone the repo and pull updates.</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="font-mono text-sm text-accent w-5 flex-shrink-0">3.</div>
+                <div>
+                  <div class="text-sm font-medium text-white">A project with tests</div>
+                  <div class="text-muted-2 text-xs mt-0.5">devit is TDD-first. A test runner should be configured in your project.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-border">
+              <div class="section-label mb-3">Supported stacks</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">Node / TypeScript</span>
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">Python</span>
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">Go</span>
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">Rust</span>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-border">
+              <div class="section-label mb-3">Package managers (Node)</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">bun</span>
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">pnpm</span>
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">yarn</span>
+                <span class="font-mono text-xs bg-surface border border-border rounded px-2.5 py-1 text-muted-2">npm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ GITHUB CTA ░░ -->
+  <section class="py-28 border-t border-border relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full"
+           style="background: radial-gradient(ellipse, rgba(56,189,248,0.06) 0%, transparent 65%);"></div>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-6 text-center reveal">
+      <div class="badge mx-auto mb-8">
+        <svg class="w-3.5 h-3.5 text-yellow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 18.896l-7.416 4.517 1.48-8.279L0 9.306l8.332-1.151z"/></svg>
+        Open source, MIT licensed
+      </div>
+
+      <h2 class="font-display font-bold leading-tight mb-5" style="font-size: clamp(2rem, 4.5vw, 3.2rem);">
+        Build something worth shipping.<br>
+        <span class="text-gradient">Every single time.</span>
+      </h2>
+
+      <p class="text-muted-2 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+        devit is free, open source, and built for developers who care about doing the job right. If it helps your workflow, a GitHub star goes a long way.
+      </p>
+
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="https://github.com/jxnata/devit-skill" target="_blank" rel="noopener" class="btn-solid text-base py-3 px-8">
+          <svg class="w-5 h-5 text-yellow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 18.896l-7.416 4.517 1.48-8.279L0 9.306l8.332-1.151z"/></svg>
+          Star on GitHub
+        </a>
+        <a href="#install" class="btn-outline text-base py-3 px-8">
+          Install devit
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="border-t border-border py-10">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-5">
+      <a href="#" class="font-mono text-accent font-medium">devit</a>
+      <div class="text-muted text-sm text-center">
+        Built for <a href="https://claude.ai/code" target="_blank" rel="noopener" class="hover:text-accent transition-colors">Claude Code</a>. MIT License. Free forever.
+      </div>
+      <div class="flex items-center gap-5">
+        <a href="https://github.com/jxnata/devit-skill" target="_blank" rel="noopener"
+           class="flex items-center gap-1.5 text-muted hover:text-white text-sm transition-colors">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+          </svg>
+          GitHub
+        </a>
+        <a href="https://github.com/jxnata/devit-skill/blob/master/LICENSE" target="_blank" rel="noopener"
+           class="text-muted hover:text-white text-sm transition-colors">License</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); observer.unobserve(e.target); } }),
+      { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Smooth anchor scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href').slice(1);
+        if (!id) return;
+        const target = document.getElementById(id);
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+
+    // Active nav highlight on scroll
+    const sections = ['how-it-works', 'features', 'install'].map(id => document.getElementById(id)).filter(Boolean);
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    const sectionObserver = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            navLinks.forEach(link => {
+              const href = link.getAttribute('href').slice(1);
+              if (href === entry.target.id) {
+                link.style.color = '#C8D8E8';
+              } else {
+                link.style.color = '';
+              }
+            });
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
+    sections.forEach(s => sectionObserver.observe(s));
+  </script>
+</body>
+</html>
