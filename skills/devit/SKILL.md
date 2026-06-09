@@ -1,6 +1,6 @@
 ---
 name: devit
-description: Organized, TDD-driven feature development workflow. Use when planning or executing features, epics, or tasks in any project. Manages the .devit folder, breaks large features into epics and atomic tasks, enforces test-first development, and tracks progress through meta.json. Trigger on: /devit, devit start, devit plan, devit execute, plan epic, plan feature, execute task, TDD workflow.
+description: "Organized, TDD-driven feature development workflow. Use when planning or executing features, epics, or tasks in any project. Manages the .devit folder, breaks large features into epics and atomic tasks, enforces test-first development, and tracks progress through meta.json. Trigger on: /devit, devit start, devit plan, devit execute, plan epic, plan feature, execute task, TDD workflow."
 ---
 
 # Devit

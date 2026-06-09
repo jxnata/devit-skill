@@ -50,7 +50,15 @@ Each task is scoped to **1–2 hours of focused work**. Tests are written before
 
 - [Claude Code](https://claude.ai/code) installed and authenticated
 
-### One-line install
+### Install via `skills` CLI (recommended)
+
+If you have the [`skills`](https://www.npmjs.com/package/skills) tool:
+
+```bash
+npx skills add jxnata/devit-skill
+```
+
+### One-line install (git clone)
 
 ```bash
 git clone https://github.com/jxnata/devit-skill.git && cd devit-skill && bash install.sh
