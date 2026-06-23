@@ -14,7 +14,7 @@
 
 2. **`.devit/` must exist.** If `.devit/PLANNING.md` is missing, tell the user to run `/devit start` first and stop.
 
-3. **Read the project's `.devit/PLANNING.md`** — it is the authoritative format guide for this project. Use its task JSON schema, ordering guidelines, and checklist throughout this flow.
+3. **Read the project's `.devit/PLANNING.md` once.** It is the authoritative format guide for this project: the task JSON schema, task-sizing rules, dependency ordering, and the planning checklist all live there — **not repeated in this file**. Use it directly when you get to Steps 4–6 below.
 
 ---
 
@@ -39,10 +39,10 @@ Wait for the user's reply. Ask follow-up questions if the objective is unclear o
 **Decide based on estimated effort and scope:**
 
 | Scenario                                       | Decision              |
-|-----------------------------------------------|-----------------------|
-| Multiple concerns, >1 PR, likely >3 tasks     | → Epic                |
-| Single isolated change, ≤1–2h, one concern    | → Simple task         |
-| Unclear                                        | → Ask the user        |
+|-------------------------------------------------|-----------------------|
+| Multiple concerns, >1 PR, likely >3 tasks       | → Epic                |
+| Single isolated change, ≤1–2h, one concern      | → Simple task         |
+| Unclear                                         | → Ask the user        |
 
 **If simple task:** Tell the user:
 ```
@@ -67,108 +67,29 @@ If no epics exist, start at 1. Otherwise `N = last + 1`.
 
 ## Step 4 — Break the feature into tasks
 
-Apply the guidelines from the project's `.devit/PLANNING.md`:
-
-**Ordering (always follow this dependency order):**
-1. Foundation — query keys, hooks, utilities, data models, types
-2. Building — components, forms, dialogs, API layers
-3. Composition — tables, lists, pages assembling building blocks
-4. Integration — routes, navigation, E2E connections
-
-**Task sizing:**
-- Each task: 1–2 hours of focused work
-- Good: one component + its tests; a form (3–5 fields); a hook/utility + tests
-- Split when: full page → layout + sections; large form → subcomponents; CRUD → per layer
-- Combine when: trivial imports, renames, or config tweaks
-
-**TDD first:** Every non-trivial task must list failing tests to write *before* implementing. The `tests` array must not be empty unless the task is genuinely trivial (e.g. a rename).
-
-**Task JSON format** (from the project's `PLANNING.md` schema):
-```json
-{
-  "id": 1,
-  "title": "Verb + noun, <60 chars",
-  "description": "What and why (1–3 sentences)",
-  "steps": [
-    "Write failing tests for <behavior>",
-    "Create src/path/file.ts",
-    "Define <schema/type>: field (validation)",
-    "Implement to pass tests",
-    "Refactor safely"
-  ],
-  "tests": ["Happy path", "Validation errors", "Edge cases", "Conditional logic"],
-  "acceptanceCriteria": [
-    "All tests pass",
-    "Feature behaves as specified",
-    "Loading/error/empty states handled",
-    "No TypeScript errors"  // adapt to the stack's equivalent
-  ],
-  "files": {
-    "modify": ["src/existing.ts"],
-    "create": ["src/new.ts", "src/new.test.ts"]
-  }
-}
-```
-
-Adjust the last acceptance criterion to match the project's stack (e.g. `No mypy errors`, `Passes cargo check`).
+Apply the task-sizing, dependency-ordering, and TDD-first rules from the project's `.devit/PLANNING.md` (already read in Prerequisites). Use its task JSON schema exactly — don't invent a different shape, and adapt its final acceptance-criterion line to the project's stack (e.g. `No mypy errors`).
 
 ---
 
 ## Step 5 — Write the epic files
 
-Create the directory and files:
 ```bash
 mkdir -p .devit/epics/{N}/tasks
 ```
 
-**meta.json** (`.devit/epics/{N}/meta.json`):
-```json
-{
-  "epic": "E{NN}",
-  "title": "<title>",
-  "objective": "<objective — 1-2 sentences of business value>",
-  "branch": "feature/<kebab-slug>",
-  "pull_request": null,
-  "pr_per_task": false,
-  "tasks": [
-    {
-      "id": 1,
-      "title": "<task 1 title>",
-      "file": "tasks/1.json",
-      "status": "pending",
-      "commits": [],
-      "pull_request": null
-    }
-  ]
-}
-```
+Copy this skill's own skeleton templates and fill in the fields per the schema in the project's `PLANNING.md`:
 
-**plan.md** (`.devit/epics/{N}/plan.md`, ≤40 lines):
-- 1 paragraph: context and problem being solved
-- `## Scope` section: bullet list of what's included
-- `## Key Decisions` section: architectural choices already made
-- `## References` section: relevant files, docs, tickets
-
-**tasks/{M}.json** — one file per task, using the schema above.
+| Skeleton (this skill's `templates/`) | Destination |
+|---|---|
+| `epic-meta.json` | `.devit/epics/{N}/meta.json` |
+| `epic-plan.md` | `.devit/epics/{N}/plan.md` (≤40 lines: context, scope, key decisions, references) |
+| `task.json` | `.devit/epics/{N}/tasks/{M}.json` — one per task |
 
 ---
 
 ## Step 6 — Run the planning checklist
 
-From the project's `.devit/PLANNING.md` checklist:
-
-```
-- [ ] Clear title and objective
-- [ ] Tasks 1–2h, well named (verb + noun)
-- [ ] Tests written first (TDD) — tests array populated for every non-trivial task
-- [ ] Ordered by dependency (foundation → building → composition → integration)
-- [ ] Steps are specific (concrete paths, validations, patterns)
-- [ ] Acceptance criteria are measurable outcomes
-- [ ] Files lists are complete (modify + create)
-- [ ] No blockers between tasks
-```
-
-If any item fails, revise the relevant tasks before proceeding.
+Run the epic through the checklist in the project's `.devit/PLANNING.md` before proceeding. If any item fails, revise the relevant tasks first.
 
 ---
 

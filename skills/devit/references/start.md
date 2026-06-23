@@ -33,8 +33,8 @@ Probe the following manifest files in order. A project may hit multiple (e.g. a 
 
 ### Node / JavaScript / TypeScript
 - Manifest: `package.json`
-- Package manager: check lockfiles in order — `bun.lockb` → bun, `pnpm-lock.yaml` → pnpm, `yarn.lock` → yarn, else npm.
-- Scripts: read `package.json` `.scripts` object. Map:
+- Package manager: check lockfiles in **one** combined command rather than separate probes per file, e.g. `ls bun.lockb pnpm-lock.yaml yarn.lock package-lock.json 2>/dev/null` — order of precedence is `bun.lockb` → bun, `pnpm-lock.yaml` → pnpm, `yarn.lock` → yarn, else npm.
+- Scripts: read `package.json` `.scripts` object (you're already reading the file for the manifest check above — reuse that read, don't re-fetch it). Map:
   - type-check → `typecheck`, `type-check`, `tsc`, `tsc --noEmit`
   - lint → `lint`, `eslint`
   - test → `test`, `jest`, `vitest`
@@ -49,32 +49,9 @@ Check `package.json` devDependencies / dependencies:
 - `@testing-library/react-native` + `jest` → React Native / Expo patterns (check `src/app/` — if present, tests for routes go in `src/__tests__/app/**`)
 - No test framework found → warn (see Step 3)
 
-### Python
-- Manifests: `pyproject.toml`, `setup.cfg`, `requirements.txt`, `Pipfile`
-- Commands:
-  - type-check → `mypy .` (if mypy in deps), else `pyright`
-  - lint → `ruff check .` (if ruff in deps), else `flake8`
-  - test → `pytest`
-  - build → `python -m build` or project-specific
-- Test placement: `tests/` or `test/` directory, files named `test_*.py` or `*_test.py`
+### Other stacks (Python, Go, Rust)
 
-### Go
-- Manifest: `go.mod`
-- Commands:
-  - type-check → `go vet ./...`
-  - lint → `golangci-lint run` (if present), else `go vet ./...`
-  - test → `go test ./...`
-  - build → `go build ./...`
-- Test placement: co-located `*_test.go` files
-
-### Rust
-- Manifest: `Cargo.toml`
-- Commands:
-  - type-check → `cargo check`
-  - lint → `cargo clippy`
-  - test → `cargo test`
-  - build → `cargo build`
-- Test placement: inline `#[cfg(test)]` modules or `tests/` integration directory
+If the primary manifest isn't `package.json` (e.g. `pyproject.toml`, `go.mod`, `Cargo.toml`), read `references/stacks-other.md` now for that stack's detection rules — don't guess.
 
 ---
 

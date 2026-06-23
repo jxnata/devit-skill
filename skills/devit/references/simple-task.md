@@ -66,16 +66,12 @@ No epic/task suffix needed for simple tasks.
 
 ---
 
-## Step 6 — Optional: record the work
+## Step 6 — Recording the work (skip by default)
 
-If the project has `.devit/` initialized, you may optionally record simple tasks in a lightweight log file:
-
-`.devit/simple-tasks.md` — append a line:
+**Don't do this unless the user explicitly asks to track simple tasks in a log.** It costs an extra file edit and commit for no functional benefit — the git history already records the change. Only if asked, append a line to `.devit/simple-tasks.md`:
 ```
 - {date} | {type}: {description} | {commit-hash}
 ```
-
-This is optional and lightweight — no `meta.json` or epic folder is created.
 
 ---
 

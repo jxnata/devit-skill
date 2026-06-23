@@ -1,0 +1,53 @@
+{
+  "skill_name": "devit",
+  "evals": [
+    {
+      "id": 0,
+      "name": "small-search",
+      "prompt": "I have a Node/TypeScript project here (vitest + eslint already set up). I need you to add a case-insensitive full-text search method to the ItemStore class in src/store.ts.\n\nSpec:\n- Add search(query: string): Item[] to src/store.ts\n- Matches items where name OR text contains the query as a substring, case-insensitive\n- Empty query returns all items\n- No-match returns []\n- Preserve insertion order in results\n- No new files needed, just extend the existing class\n\nUse a structured, test-first workflow: plan the work first, write failing tests before implementing, then implement, then run typecheck/lint/test and only consider it done when everything is green. Don't leave anything half-finished.",
+      "expected_output": "search() method added to ItemStore with tests written before implementation (TDD), all acceptance criteria met, typecheck/lint/test all passing, no regressions to existing store tests.",
+      "files": [],
+      "assertions": [
+        "typecheck (tsc --noEmit) passes with no errors",
+        "lint (eslint) passes with no errors",
+        "test suite passes, including pre-existing store tests (no regressions)",
+        "Independent grader-authored spec-conformance tests pass (not the agent's own self-written tests)",
+        ".devit/ initialized with PLANNING.md and EXECUTION.md (devit's structural contribution)",
+        "Task correctly routed as a simple task, not an unnecessary epic",
+        "Git history shows a distinct test-first commit before the implementation commit (visible red-green TDD evidence)"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "medium-tagindex",
+      "prompt": "Same project (Node/TS, vitest + eslint, has an existing ItemStore in src/store.ts). I want to add a tag system: a new module src/tags.ts with a TagIndex class.\n\nInterface:\n  addTag(itemId: string, tag: string): void\n  removeTag(itemId: string, tag: string): void\n  getTags(itemId: string): string[]\n  findByTag(tag: string): string[]   // item ids\n  clearItem(itemId: string): void\n\nBehaviour:\n- addTag is idempotent (adding the same tag twice is a no-op)\n- removeTag on a non-existent tag or item is a no-op, never throws\n- getTags returns tags in sorted order\n- findByTag returns item ids in insertion order of the first addTag call for that tag\n- clearItem removes all tag associations for that item id\n- TagIndex must NOT depend on ItemStore -- it should work with any source of ids\n\nPlan this properly and implement it with TDD -- write the test file (src/tags.test.ts) covering all behaviours and edge cases (unknown itemId, unknown tag, empty tag list) before writing the implementation. Run typecheck, lint, and tests, and make sure the existing seed tests still pass too. Only stop once everything is green.",
+      "expected_output": "src/tags.ts with TagIndex class implementing all 5 methods per spec, src/tags.test.ts with tests written first covering idempotency/no-ops/ordering/edge cases, typecheck/lint/test all green, no regression to existing store tests. If devit is used: epic or simple-task structure reflecting the planning, with task/epic state tracked.",
+      "files": [],
+      "assertions": [
+        "typecheck (tsc --noEmit) passes with no errors",
+        "lint (eslint) passes with no errors",
+        "test suite passes, including pre-existing store tests (no regressions)",
+        "Independent grader-authored spec-conformance tests pass (not the agent's own self-written tests)",
+        ".devit/ initialized with PLANNING.md and EXECUTION.md (devit's structural contribution)",
+        "Task correctly routed as a simple task, not an unnecessary epic",
+        "Git history shows a distinct test-first commit before the implementation commit (visible red-green TDD evidence)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "large-jobqueue",
+      "prompt": "Same project (Node/TS, vitest + eslint). I want to add a small in-memory job queue module: src/queue.ts exporting a JobQueue class, plus integrating it so jobs can reference items in the existing ItemStore.\n\nRequirements:\n- enqueue(job: { id: string; itemId: string; type: string; payload?: unknown }): void -- throws if a job with that id already exists, or if itemId doesn't exist in the given ItemStore\n- dequeue(): the next pending job (FIFO) or undefined if the queue is empty; marks it 'running'\n- complete(jobId: string): marks a running job 'completed'; no-op if job not found or not running\n- fail(jobId: string, error: string): marks a running job 'failed' and records the error message; no-op if not found or not running\n- getStatus(jobId: string): 'pending' | 'running' | 'completed' | 'failed' | undefined\n- listByStatus(status): string[] of job ids with that status, in enqueue order\n- JobQueue takes an ItemStore instance in its constructor to validate itemId references\n\nThis is a decent-sized feature with multiple concerns (queue mechanics, status transitions, validation against ItemStore, listing/filtering). Plan it out properly -- break it into a sensible sequence of pieces if that helps -- and implement everything with TDD: tests before code for each piece, then implementation, then verification. Run typecheck, lint, and the full test suite, and don't stop until everything is green and the feature fully matches the spec above.",
+      "expected_output": "src/queue.ts with JobQueue implementing all methods and status transitions correctly, comprehensive tests written before implementation covering validation errors, FIFO ordering, status transitions, and listByStatus filtering. typecheck/lint/test all green, no regressions. If devit is used: this should be substantial enough to warrant epic-style breakdown (meta.json, multiple tasks, tracked progress) rather than a single simple task.",
+      "files": [],
+      "assertions": [
+        "typecheck (tsc --noEmit) passes with no errors",
+        "lint (eslint) passes with no errors",
+        "test suite passes, including pre-existing store tests (no regressions)",
+        "Independent grader-authored spec-conformance tests pass (not the agent's own self-written tests)",
+        ".devit/ initialized with PLANNING.md and EXECUTION.md (devit's structural contribution)",
+        "Multi-concern task correctly routed to epic planning with multiple ordered tasks (not a single simple task)",
+        "Git history shows a distinct test-first commit before the implementation commit, per task (visible red-green TDD evidence)"
+      ]
+    }
+  ]
+}
